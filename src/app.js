@@ -1,18 +1,22 @@
+import Buefy from 'buefy'
 import Vue from 'vue';
 import VueRouter from 'vue-router'
 import Storage from 'vue-web-storage';  
+
+import 'buefy/dist/buefy.css'
 
 Vue.use(Storage, {
   prefix: 'shoplist_',// default `app_`
   drivers: ['local'], // default 'local'
 });
 
-Vue.use(VueRouter)
+Vue.use(VueRouter);
+
+Vue.use(Buefy);
 
 import App from './views/App'
-// import Hello from './views/Hello'
 import Home from './views/Home'
-// import Login from './views/Login'
+import List from './views/List'
 
 const router = new VueRouter({
     mode: 'history',
@@ -21,22 +25,17 @@ const router = new VueRouter({
             path: '/',
             name: 'home',
             component: Home
+        },
+        {
+            path: '/list/:id',
+            name: 'list',
+            component: List
         }
-        // {
-        //     path: '/hello',
-        //     name: 'hello',
-        //     component: Hello,
-        // },
-        // {
-        // 	path: '/login',
-        // 	name: 'login',
-        // 	component: Login,
-        // }
     ],
 });
 
 const app = new Vue({
     el: '#app',
     components: { App },
-    router,
+    router
 });

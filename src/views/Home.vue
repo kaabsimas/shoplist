@@ -9,31 +9,24 @@
             </div>
         </section>
         <section>
-        	<form action="">
-        		<modal v-bind:modal=modal>
-        			<new-list v-bind:form=newList></new-list>
-        			<div slot="footer">
-        				<button class="button is-success" @click="this.save">{{ modal.save }}</button>
-		      			<button class="button" @click="this.close">{{ modal.cancel }}</button>
-        			</div>
-        		</modal>
-        	</form>
-        	<div class="container has-text-centered">
+           	<div class="container has-text-centered">
 			    <table class="table is-fullwidth is-striped is-hoverable">
 			    	<tbody>
 			    		<tr v-for="(name, index) in lists" class="is-unselectable">
 			    			<td class="is-size-4-touch is-size-3-desktop">
-			    				{{ name }}
+				    			<router-link v-bind:to="`/list/${index}`">
+			    					{{ name }}
+				    			</router-link>
 			    			</td>
 			    			<td>
-								<div class="button is-danger is-large" @click="remove(index)">
+								<div class="button is-danger is-large is-pulled-right" @click="remove(index)">
 									<i class="fa fa-trash"></i>
 								</div>
 			    			</td>
 			    		</tr>
 			    	</tbody>
 			    </table>
-	        	<div class="button is-link is-large" @click="show">
+	        	<div class="button is-link is-large" @click="prompt">
 	        		<span class="icon is-small">
 				      <i class="fa fa-plus"></i>
 				    </span>
@@ -45,39 +38,31 @@
     </div>
 </template>
 <script>
-	import modal from '../components/modal.vue';
-	import newList from '../views/forms/newList.vue';
-
 	export default {
 		data: function(){
 			return {
-				newList: {name:''},
-				modal: {
-					title: "Nova Lista",
-					save: "Criar",
-					cancel: "Cancelar",
-					active: false
-				},
 				lists: null
 			};
 		},
-		components:{
-			modal,
-			newList
-		},
 		methods: {
-			show: function(){
-				this.modal.active = true;
-			},
-			close() {
-		 		this.modal.active = false;
-		 	},
-		 	save() {
-				this.lists.push( this.newList.name );
-			},
 			remove( index ) {
 				if( this.lists.length > 0 )
 					this.lists.splice( index, 1 );
+			},
+			prompt() {
+				this.$dialog.prompt({
+                    message: `Nova Lista`,
+                    inputAttrs: {
+                        placeholder: 'Nome ex.:"compras de mês"',
+                        confirmText: "Criar",
+                        cancelText: "Cancelar",
+                        maxlength: 50
+                    },
+                    onConfirm: (value) => {
+                    	this.lists.push( value );
+                    	this.$toast.open({message:'nova lista criada', type: 'is-success'});
+                    }
+                });
 			}
 		},
 		mounted() {
