@@ -10,9 +10,6 @@
 				</div>
 			</div>
 		</section>
-		<b-modal :active.sync="isModalActive" has-modal-card>
-			<new-item v-bind="{formProps}"></new-item>
-		</b-modal>
 		<div class="container has-text-centered">
 			<table class="table is-fullwidth is-striped is-hoverable">
 		    	<tbody>
@@ -28,14 +25,15 @@
 		    		</tr>
 		    	</tbody>
 		    </table>
-		    <div class="button is-link is-large" @click="isModalActive = true">
+		    <new-item v-bind="{listId:this.id, item: this.item}"></new-item>
+		    <!-- <div class="button is-link is-large" @click="isModalActive = true">
         		<span class="icon is-small">
 			      <i class="fa fa-plus"></i>
 			    </span>
 			    &nbsp;
 			    Novo Item
 		    </div>
-		</div>
+ -->		</div>
 	</div>	
 </template>
 <script>
@@ -46,9 +44,7 @@
 				id: null,
 				nome: null,
 				isModalActive: false,
-				formProps: {
-					itemName: null
-				},
+				item: {},
 				items: []
 			}
 		},
@@ -69,13 +65,13 @@
 			newItem
 		},
 		methods: {
-			save(){
-				let newItemName = this.formProps.itemName,
-					newItem 	= {list_id: this.id, name: newItemName},
-					items   	= this.$localStorage.get('items', []);
-				items.push(newItem);
-				this.$localStorage.set('items', items);
-			},
+			// save(){
+			// 	let newItemName = this.formProps.itemName,
+			// 		newItem 	= {list_id: this.id, name: newItemName},
+			// 		items   	= this.$localStorage.get('items', []);
+			// 	items.push(newItem);
+			// 	this.$localStorage.set('items', items);
+			// },
 			remove( index ){
 				let items =	this.$localStorage.get('items', []);
 

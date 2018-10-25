@@ -14,12 +14,12 @@
 			    	<tbody>
 			    		<tr v-for="(name, index) in lists" class="is-unselectable">
 			    			<td class="is-size-4-touch is-size-3-desktop">
-				    			<router-link v-bind:to="`/list/${index}`">
-			    					{{ name }}
+				    			<router-link v-bind:to="`/list/${name.id}`">
+			    					{{ name.title }}
 				    			</router-link>
 			    			</td>
 			    			<td>
-								<div class="button is-danger is-large is-pulled-right" @click="remove(index)">
+								<div class="button is-danger is-large is-pulled-right" @click="remove(name.id)">
 									<i class="fa fa-trash"></i>
 								</div>
 			    			</td>
@@ -41,14 +41,36 @@
 	export default {
 		data: function(){
 			return {
-				lists: null
+				lists: []
 			};
 		},
 		methods: {
-			remove( index ) {
-				if( this.lists.length > 0 )
-					this.lists.splice( index, 1 );
+			update(){
+				return new Promise((resolve, reject) => {
+					this.$db.nada.toArray()
+						.then( lists => this.lists = lists )
+						.catch(error => reject(error));
+				});
 			},
+			add( value ){
+				return new Promise((resolve, reject) => {
+					this.$db.lists.add({
+						title: value,
+						created_at: new Date()
+					})
+					.then(() => {
+						resolve(this.update()); 
+					}).catch(error => reject(error));
+				});
+			},
+			remove(id){
+		    	this.$db.lists.where('id').equals(id).delete()
+		    		.then(() => {
+		    			throw {message: "Erro Porra!"};
+		    			this.update()
+		    		})
+		    		.then(() => this.$toast.open({message:'lista removida', type: 'is-warning'}));
+		    },
 			prompt() {
 				this.$dialog.prompt({
                     message: `Nova Lista`,
@@ -59,19 +81,25 @@
                         maxlength: 50
                     },
                     onConfirm: (value) => {
-                    	this.lists.push( value );
-                    	this.$toast.open({message:'nova lista criada', type: 'is-success'});
+                    	this.add( value ).then(() => {
+                    		this.$toast.open({message:'nova lista criada', type: 'is-success'});
+                    	}).catch((e) => {
+                    		this.$toast.open({message:`houve um erro ao salvar a lista: ${e.message}`, type: 'is-danger'});
+                    	});
                     }
                 });
 			}
 		},
 		mounted() {
-			this.lists = this.$localStorage.get('lists', []);
-		},
-		watch:{
-			lists(value) {
-				this.$localStorage.set('lists', value);
-			}
+			this.update()
+				.catch(e => {
+					this.$toast.open(
+						{
+							message: `houve um erro ao buscar listas`, 
+							type: 'is-danger',
+							duration: 3500
+						});
+				});
 		}
 	}
 </script>
